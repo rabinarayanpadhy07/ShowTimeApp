@@ -1,0 +1,192 @@
+@import 'tailwindcss';
+
+/*
+ * ShowTime design tokens. Every colour, radius and shadow used by components
+ * comes from here (Tailwind v4 turns each token into utilities, e.g.
+ * --color-primary -> bg-primary / text-primary / border-primary).
+ *
+ * Contrast notes (WCAG 2.2, measured against #FFFFFF):
+ *   #FF5A5F coral  3.0:1  -> backgrounds and decorative use only; labels on
+ *                            coral use --color-on-primary (#222222, 5.2:1).
+ *   #D7373C coral-strong 4.7:1 -> coral text and links on white.
+ *   #00A699 teal   3.0:1  -> success fills/icons; success text uses
+ *                            --color-secondary-strong (#00756C, 5.6:1).
+ *   #717171 muted  4.9:1  -> smallest permitted text colour.
+ */
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+
+  /* Brand: primary coral (primary actions) */
+  --color-primary: #ff5a5f;
+  --color-primary-hover: #ff385c;
+  --color-primary-strong: #d7373c;
+  --color-primary-soft: #fff1f1;
+  --color-on-primary: #222222;
+
+  /* Brand: secondary teal (success / positive states) */
+  --color-secondary: #00a699;
+  --color-secondary-hover: #008f84;
+  --color-secondary-strong: #00756c;
+  --color-secondary-soft: #e6f6f5;
+  --color-on-secondary: #222222;
+
+  /* Brand: accent orange (promotional highlights, use sparingly) */
+  --color-accent: #fc642d;
+  --color-accent-strong: #b23f12;
+  --color-accent-soft: #fff0ea;
+
+  /* Neutrals */
+  --color-ink: #222222;
+  --color-ink-secondary: #484848;
+  --color-ink-muted: #717171;
+  --color-line: #dddddd;
+  --color-surface: #ffffff;
+  --color-surface-subtle: #f7f7f7;
+
+  /* Feedback */
+  --color-danger: #c13515;
+  --color-danger-soft: #fdf0ed;
+
+  /* Shape */
+  --radius-card: 0.875rem;
+  --radius-control: 0.625rem;
+
+  /* Elevation (subtle) */
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 2px 8px rgb(0 0 0 / 0.06);
+  --shadow-elevated: 0 6px 16px rgb(0 0 0 / 0.12);
+  --shadow-sticky: 0 -4px 16px rgb(0 0 0 / 0.08);
+
+  /* Poster wall in the home hero: each track holds its list twice and moves by half. */
+  --animate-marquee-up: marquee-up 45s linear infinite;
+  --animate-marquee-left: marquee-left 40s linear infinite;
+
+  @keyframes marquee-up {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-50%);
+    }
+  }
+
+  @keyframes marquee-left {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-surface font-sans text-ink antialiased;
+    font-optical-sizing: auto;
+  }
+
+  /* Form controls do not inherit the page font in every browser. */
+  button,
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+  }
+
+  /* One consistent, high-contrast keyboard focus indicator for everything. */
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+
+  /* Tailwind 4 resets buttons to the default cursor; everything clickable gets a pointer. */
+  a[href],
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  [role='menuitem'],
+  [role='tab'],
+  [role='option'],
+  summary,
+  label[for],
+  select:not(:disabled),
+  input[type='checkbox']:not(:disabled),
+  input[type='radio']:not(:disabled),
+  input[type='file']:not(:disabled),
+  input[type='range']:not(:disabled),
+  input[type='date']:not(:disabled),
+  input[type='datetime-local']:not(:disabled),
+  input[type='time']:not(:disabled) {
+    cursor: pointer;
+  }
+
+  :disabled,
+  [aria-disabled='true'] {
+    cursor: not-allowed;
+  }
+
+  ::selection {
+    background-color: var(--color-primary-soft);
+    color: var(--color-ink);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/*
+ * Scroll reveal: elements marked data-reveal fade and rise into place the first time they scroll
+ * into view (see components/ui/Reveal.jsx). Content is only hidden once JavaScript has confirmed it
+ * can reveal it again (html.reveal-ready), and never for people who prefer reduced motion.
+ */
+@layer components {
+  @media (prefers-reduced-motion: no-preference) {
+    html.reveal-ready [data-reveal]:not([data-revealed]) {
+      opacity: 0;
+      transform: translateY(28px) scale(0.98);
+    }
+
+    html.reveal-ready [data-reveal] {
+      transition:
+        opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+        transform 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+        box-shadow 0.2s ease;
+    }
+  }
+}
+
+@utility container-page {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 80rem;
+  padding-inline: 1rem;
+
+  @media (width >= 40rem) {
+    padding-inline: 1.5rem;
+  }
+
+  @media (width >= 64rem) {
+    padding-inline: 2rem;
+  }
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
